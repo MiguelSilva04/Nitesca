@@ -5,8 +5,8 @@ export const dict = {
   pt: {
     meta: {
       htmlLang: 'pt-PT',
-      title: 'Nitesca — Estúdio de web design em Évora',
-      description: 'Sites feitos à mão para negócios que ainda não têm quem os encontre online.',
+      title: 'Nitesca',
+      description: 'Mais visibilidade online para o seu negócio — do zero, ou a partir do que já tem.',
     },
     lang: { group: 'Idioma', switchTo: 'Mudar para' },
     header: {
@@ -101,8 +101,8 @@ export const dict = {
   en: {
     meta: {
       htmlLang: 'en',
-      title: 'Nitesca — Web design studio in Évora, Portugal',
-      description: 'Hand-made websites for businesses that nobody can find online yet.',
+      title: 'Nitesca',
+      description: 'More online visibility for your business — from scratch, or from what you already have.',
     },
     lang: { group: 'Language', switchTo: 'Switch to' },
     header: {
@@ -112,7 +112,7 @@ export const dict = {
       cta: 'Get a quote',
     },
     hero: {
-      eyebrow: 'WEBSITE DESIGN AGENCY',
+      eyebrow: 'WEBSITE CREATION AGENCY',
       title: 'More online visibility for your business — from scratch, or from what you already have.',
       lead: 'Whether it’s launching a new website, getting more out of what you already have on social media or Google, or rebuilding an outdated site — the goal is always the same: the most effective way for your business to be found.',
       ctaWork: 'See portfolio',
