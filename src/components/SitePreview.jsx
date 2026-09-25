@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLang } from '../i18n/LangContext.jsx'
 
 // macOS-style window zoom: the dialog grows out of / shrinks into a point on screen.
 // Returns the running animations so the caller can cancel their fill after closing.
@@ -20,6 +21,7 @@ const chipPoint = () => ({ x: 100, y: innerHeight - 38 })
 // Fake browser window (native <dialog>: focus trap, Esc to close, backdrop) with the live demo site in an iframe.
 // Traffic lights: red closes, yellow minimises to a chip (iframe state kept), green toggles full screen.
 export default function SitePreview({ project, onClose }) {
+  const b = useLang().t.browser
   const dialog = useRef(null)
   const frame = useRef(null)
   const minimising = useRef(false)
@@ -76,7 +78,7 @@ export default function SitePreview({ project, onClose }) {
   }
 
   const current = hist.list[hist.i] ? new URL(hist.list[hist.i]).hash : ''
-  const address = 'nitesca.com/exemplos/' + project.site.replace(/^portfolio\/|\.html$/g, '') + current
+  const address = `nitesca.com/${b.path}/` + project.site.replace(/^portfolio\/|\.html$/g, '') + current
 
   // Every close path (red, ✕, Esc, backdrop, minimise) shrinks the window into a point first.
   const shrinkAndClose = point => {
@@ -107,26 +109,26 @@ export default function SitePreview({ project, onClose }) {
       <dialog
         ref={dialog}
         className={max ? 'browser browser-max' : 'browser'}
-        aria-label={`${project.name} — site de demonstração`}
+        aria-label={`${project.name} — ${b.demo}`}
         onClose={handleClose}
         onCancel={ev => { ev.preventDefault(); closeWin() }}
         onClick={ev => { if (ev.target === dialog.current) closeWin() }}
       >
         <div className="browser-bar">
           <div className="browser-dots">
-            <button type="button" aria-label="Fechar" onClick={closeWin}>×</button>
-            <button type="button" aria-label="Minimizar" onClick={minimise}>−</button>
-            <button type="button" aria-label={max ? 'Sair de ecrã inteiro' : 'Ecrã inteiro'} onClick={() => setMax(m => !m)}>+</button>
+            <button type="button" aria-label={b.close} onClick={closeWin}>×</button>
+            <button type="button" aria-label={b.minimise} onClick={minimise}>−</button>
+            <button type="button" aria-label={max ? b.exitFullscreen : b.fullscreen} onClick={() => setMax(m => !m)}>+</button>
           </div>
           <div className="browser-nav">
-            <button type="button" aria-label="Retroceder" disabled={hist.i <= 0} onClick={() => go(-1)}>←</button>
-            <button type="button" aria-label="Avançar" disabled={hist.i >= hist.list.length - 1} onClick={() => go(1)}>→</button>
-            <button type="button" aria-label="Recarregar" onClick={() => win()?.location.reload()}>↻</button>
+            <button type="button" aria-label={b.back} disabled={hist.i <= 0} onClick={() => go(-1)}>←</button>
+            <button type="button" aria-label={b.forward} disabled={hist.i >= hist.list.length - 1} onClick={() => go(1)}>→</button>
+            <button type="button" aria-label={b.reload} onClick={() => win()?.location.reload()}>↻</button>
           </div>
           <div className="browser-url"><span className="browser-lock" aria-hidden="true">●</span>{address}</div>
-          <button type="button" className="browser-close" aria-label="Fechar" onClick={closeWin}>✕</button>
+          <button type="button" className="browser-close" aria-label={b.close} onClick={closeWin}>✕</button>
         </div>
-        <iframe ref={frame} src={project.site} title={`${project.name} (demonstração)`} onLoad={onLoad} />
+        <iframe ref={frame} src={project.site} title={`${project.name} (${b.frame})`} onLoad={onLoad} />
       </dialog>
       {minimised && (
         <button type="button" className="browser-chip" onClick={restore}>

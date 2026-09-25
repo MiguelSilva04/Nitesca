@@ -9,6 +9,8 @@ import Portefolio from './components/Portefolio.jsx'
 import Processo from './components/Processo.jsx'
 import Contacto from './components/Contacto.jsx'
 import Footer from './components/Footer.jsx'
+import LangTab from './components/LangTab.jsx'
+import { LangProvider } from './i18n/LangContext.jsx'
 
 // Former Claude Design props. gemMotion: 'viagem' (glides) | 'salto' (jumps).
 const config = { gemMotion: 'viagem', cursorPreview: true, showWordmark: true }
@@ -16,8 +18,9 @@ const config = { gemMotion: 'viagem', cursorPreview: true, showWordmark: true }
 export default function App() {
   const motion = useGemMotion(config)
   return (
-    <>
+    <LangProvider>
       <Header />
+      <LangTab />
       <Gem motion={motion} />
       <CursorPreview />
       <main>
@@ -29,6 +32,6 @@ export default function App() {
         <Contacto />
       </main>
       <Footer />
-    </>
+    </LangProvider>
   )
 }

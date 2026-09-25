@@ -8,7 +8,10 @@ const HEADER = 72
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v))
 const lerp = (a, b, t) => a + (b - a) * t
 const lineOffset = () => HEADER + (innerHeight - HEADER) * 0.3
-const hold = gap => Math.min(gap * 0.35, 220)
+// Scroll dead zone around each anchor where the gem rests. Smaller = the trip spans more scroll.
+const hold = gap => Math.min(gap * 0.2, 140)
+// How fast the gem catches up with the scroll position, per 60fps frame (0–1). Lower = slower glide.
+const FOLLOW = 0.045
 const mix = (h1, h2, t) => {
   const p = h => [1, 3, 5].map(o => parseInt((h || '#9AB0A0').slice(o, o + 2), 16))
   const a = p(h1), b = p(h2)
@@ -20,7 +23,7 @@ export function useGemMotion({ gemMotion = 'viagem', cursorPreview = true } = {}
     mouse: { x: -9999, y: -9999 },
     off: { x: 0, y: 0 }, vel: { x: 0, y: 0 }, drag: null,
     pv: { x: 0, y: 0, rot: 0, op: 0, init: false },
-    active: 0, hover: false, focusPt: null, gemIntro: 0,
+    active: 0, hover: false, focusPt: null, gemIntro: 0, p: null, last: 0,
   }).current
   const opts = useRef()
   opts.current = { gemMotion, cursorPreview }
@@ -38,16 +41,26 @@ export function useGemMotion({ gemMotion = 'viagem', cursorPreview = true } = {}
       const rects = anchors.map(a => a.getBoundingClientRect())
       const n = anchors.length
       const eff = rects.map((r, k) => Math.min(r.top + r.height / 2 + sy, yMax - (n - 1 - k) * 90))
-      let i = 0
-      for (let k = 0; k < n; k++) if (eff[k] <= y) i = k
-      const j = Math.min(i + 1, n - 1)
-      let t = 0
-      if (j > i) {
-        const gap = eff[j] - eff[i], h = hold(gap)
-        t = clamp((y - eff[i] - h) / Math.max(1, gap - 2 * h), 0, 1)
+      let i0 = 0
+      for (let k = 0; k < n; k++) if (eff[k] <= y) i0 = k
+      let t0 = 0
+      if (i0 < n - 1) {
+        const gap = eff[i0 + 1] - eff[i0], h = hold(gap)
+        t0 = clamp((y - eff[i0] - h) / Math.max(1, gap - 2 * h), 0, 1)
       }
       const reduced = rm.matches, coarse = coarseMq.matches
-      if (reduced || opts.current.gemMotion === 'salto') t = t < 0.5 ? 0 : 1
+      if (reduced || opts.current.gemMotion === 'salto') t0 = t0 < 0.5 ? 0 : 1
+      // Progress along the anchor chain (anchor index + fraction). The gem eases toward the
+      // scroll target instead of sticking to it, so even a fast flick produces a slow glide.
+      const target = i0 + t0, now = performance.now()
+      if (s.p == null || reduced) s.p = target
+      else {
+        const k = 1 - Math.pow(1 - FOLLOW, Math.min(4, (now - s.last) / 16.7)) // frame-rate independent
+        s.p += (target - s.p) * k
+        if (Math.abs(target - s.p) < 0.001) s.p = target
+      }
+      s.last = now
+      const i = Math.min(Math.floor(s.p), n - 1), j = Math.min(i + 1, n - 1), t = s.p - i
       const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
       const a = rects[i], b = rects[j]
       let cx = lerp(a.left + a.width / 2, b.left + b.width / 2, e)

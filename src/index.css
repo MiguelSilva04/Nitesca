@@ -160,6 +160,25 @@ section[id] { scroll-margin-top: 72px }
   .btn:hover, .btn-cta:hover, .btn-dark:hover, .browser-chip:hover { transform: none }
 }
 
+/* Language switcher: a dictionary thumb-index tab on the right edge */
+.lang-tab { position: fixed; right: 0; top: 50%; transform: translateY(-50%); z-index: 55; display: flex; flex-direction: column; padding: 6px 0; background: var(--teal); border: 1px solid var(--line-2); border-right: 0; border-radius: 12px 0 0 12px; box-shadow: -8px 10px 30px -14px rgba(0, 0, 0, .55) }
+.lang-tab button { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px 0 12px; border: 0; background: none; color: var(--sage); font: italic 400 19px/1 var(--serif); cursor: pointer; transition: color .2s }
+.lang-tab button:hover, .lang-tab button[aria-pressed="true"] { color: var(--cream) }
+.lang-tab button + button { border-top: 1px solid var(--line) }
+.lang-gem { width: 7px; height: 7px; flex: none; background: var(--sage); transform: rotate(45deg) scale(0); transition: transform .3s cubic-bezier(.2, .8, .2, 1) }
+.lang-tab button[aria-pressed="true"] .lang-gem { transform: rotate(45deg) scale(1) }
+.lang-name { max-width: 0; overflow: hidden; white-space: nowrap; opacity: 0; font: 500 13px/1 var(--sans); transition: max-width .35s cubic-bezier(.2, .8, .2, 1), opacity .25s }
+.lang-tab:hover .lang-name, .lang-tab:focus-within .lang-name { max-width: 90px; opacity: 1 }
+/* Phones: a slim edge tab (codes only) so it barely reaches into the 24px gutter */
+@media (max-width: 599px) {
+  .lang-tab { padding: 4px 0; border-radius: 8px 0 0 8px }
+  .lang-tab button { height: 38px; padding: 0 8px; font-size: 16px; gap: 0 }
+  .lang-gem, .lang-name { display: none }
+  .lang-tab button[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px }
+}
+/* Page cross-fade when switching language (View Transitions API) */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .35s }
+
 /* Demo site preview (fake browser window) */
 html:has(dialog[open]) { overflow: hidden }
 .browser { transition: width .35s cubic-bezier(.2, .8, .2, 1), height .35s cubic-bezier(.2, .8, .2, 1), border-radius .35s; width: 90vw; height: 90vh; height: 90dvh; max-width: none; max-height: none; padding: 0; border: 0; border-radius: 10px; overflow: hidden; background: #fff; color: #333; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .6) }
