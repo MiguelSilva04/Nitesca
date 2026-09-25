@@ -1,4 +1,7 @@
-// Fails if pt and en drift apart: same keys everywhere, same array lengths. Run: npm run check:i18n
+// Fails if the translations drift: pt and en must have identical keys and list lengths,
+// and every data-i18n / data-i18n-attr path used in index.html must resolve to a string in both.
+// Run: npm run check:i18n
+import { readFileSync } from 'node:fs'
 import { dict } from './dictionary.js'
 
 const errors = []
@@ -19,5 +22,16 @@ function walk(a, b, path) {
   }
 }
 walk(dict.pt, dict.en, 'dict')
+
+const html = readFileSync(new URL('../../index.html', import.meta.url), 'utf8')
+const keys = [
+  ...[...html.matchAll(/data-i18n="([^"]+)"/g)].map(m => m[1]),
+  ...[...html.matchAll(/data-i18n-attr="([^"]+)"/g)].flatMap(m => m[1].split(';').map(p => p.split(':')[1])),
+]
+const get = (obj, path) => path.split('.').reduce((o, k) => o?.[k], obj)
+for (const key of new Set(keys))
+  for (const lang of ['pt', 'en'])
+    if (typeof get(dict[lang], key) !== 'string') errors.push(`index.html uses "${key}", not a string in ${lang}`)
+
 if (errors.length) { console.error(errors.join('\n')); process.exit(1) }
-console.log('i18n ok: pt and en have identical structure')
+console.log(`i18n ok: pt and en match, ${new Set(keys).size} keys used in index.html all resolve`)

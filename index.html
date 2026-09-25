@@ -9,9 +9,297 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Hanken+Grotesk:wght@400;500;600&family=Fraunces:opsz@9..144&family=Archivo:wght@800&family=Lora&display=swap">
+<style>
+  /* Set before first paint by the script below; main.js clears them once it has taken over. */
+  .i18n-pending body { visibility: hidden }
+  .enter-pending [data-enter="line"] { opacity: 0 }
+  .enter-pending [data-enter="letter"] { transform: translateY(100%) }
+</style>
+<script>
+  // HTML ships in Portuguese. Hide the page for the few ms it takes main.js to swap in English
+  // (saved choice, else non-Portuguese browsers), and pre-hide the hero entrance so it doesn't flash.
+  (function (h) {
+    try {
+      var saved = localStorage.getItem('nitesca-lang')
+      var lang = saved || ((navigator.language || 'pt').toLowerCase().indexOf('pt') === 0 ? 'pt' : 'en')
+      if (lang === 'en') h.classList.add('i18n-pending')
+    } catch (e) {}
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) h.classList.add('enter-pending')
+    setTimeout(function () { h.classList.remove('i18n-pending', 'enter-pending') }, 2000) // never stay hidden if JS fails
+  })(document.documentElement)
+</script>
 </head>
 <body>
-<div id="root"></div>
-<script type="module" src="/src/main.jsx"></script>
+
+<header class="header">
+  <div class="header-in">
+    <a href="#" class="logo" aria-label="Nitesca — início" data-i18n-attr="aria-label:header.home">nite<span class="logo-s">s<span class="logo-dot"></span></span>ca</a>
+    <div class="header-right">
+      <nav class="nav" aria-label="Principal" data-i18n-attr="aria-label:header.navLabel">
+        <a href="#servicos" data-i18n="header.nav.servicos">Serviços</a>
+        <a href="#portefolio" data-i18n="header.nav.portefolio">Portefólio</a>
+        <a href="#processo" data-i18n="header.nav.processo">Como funciona</a>
+        <a href="#contacto" data-i18n="header.nav.contacto">Contacto</a>
+      </nav>
+      <a href="#contacto" class="btn-cta" data-i18n="header.cta">Pedir orçamento</a>
+    </div>
+  </div>
+</header>
+
+<!-- Language switcher: a dictionary thumb-index tab on the page edge -->
+<div class="lang-tab" role="group" aria-label="Idioma" data-i18n-attr="aria-label:lang.group">
+  <button type="button" lang="pt" data-lang="pt" aria-pressed="true"><span class="lang-gem" aria-hidden="true"></span><span class="lang-code">pt</span><span class="lang-name" aria-hidden="true">português</span></button>
+  <button type="button" lang="en" data-lang="en" aria-pressed="false"><span class="lang-gem" aria-hidden="true"></span><span class="lang-code">en</span><span class="lang-name" aria-hidden="true">English</span></button>
+</div>
+
+<!-- Floating gem: travels between every [data-gem] anchor as you scroll (gem.js) -->
+<div class="gem" data-gem-el aria-hidden="true"></div>
+
+<!-- Alentejo landscape for the Terra Alentejana cards (preview + mobile thumb) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="terra-scene" viewBox="0 0 360 232" preserveAspectRatio="xMidYMax slice">
+    <rect width="360" height="232" fill="#F4EDE0"/>
+    <circle cx="298" cy="60" r="20" fill="#D9A441"/>
+    <path d="M0 124C60 100 130 108 190 114S300 96 360 104V232H0Z" fill="#D8C79E"/>
+    <path d="M40 132h26M84 128h30M130 126h24M214 118h28M256 112h22" stroke="#B89A62" stroke-width="2" stroke-linecap="round"/>
+    <path d="M0 150C70 130 150 140 220 150S320 128 360 136V232H0Z" fill="#B08A4E"/>
+    <g fill="#3F4A34">
+      <rect x="247" y="126" width="5" height="22" rx="1"/>
+      <ellipse cx="250" cy="122" rx="24" ry="11"/>
+      <ellipse cx="236" cy="128" rx="12" ry="7"/>
+      <rect x="86" y="138" width="3" height="13" rx="1"/>
+      <ellipse cx="88" cy="136" rx="13" ry="6"/>
+    </g>
+    <path d="M0 168C90 152 190 162 260 170S330 160 360 164V232H0Z" fill="#3F4A34"/>
+  </symbol>
+</svg>
+
+<!-- Card that follows the cursor over portfolio rows; order matches the rows -->
+<div class="preview" data-preview aria-hidden="true">
+  <div class="thumb" data-thumb style="background:#E4D2B8;color:#2B2118">
+    <div class="thumb-meta"><span data-i18n="work.projects.barro.meta.0">PEÇAS FEITAS À MÃO</span><span data-i18n="work.projects.barro.meta.1">ÉVORA</span></div>
+    <div style="position:absolute;right:-56px;bottom:-56px;width:200px;height:200px;border:2px solid #A85C32;border-radius:50%"></div>
+    <div style="position:absolute;right:4px;bottom:4px;width:88px;height:88px;border:2px solid #A85C32;border-radius:50%"></div>
+    <div style="font:400 40px/1.02 Fraunces,serif;color:#A85C32;max-width:7ch" data-i18n="work.projects.barro.thumb">Ateliê de cerâmica</div>
+  </div>
+  <div class="thumb" data-thumb style="background:#1A1A18;color:#F2F0EA">
+    <div class="thumb-meta"><span data-i18n="work.projects.nucleo.meta.0">SESSÃO EXPERIMENTAL</span><span data-i18n="work.projects.nucleo.meta.1">SEG–SEX 07–21H</span></div>
+    <div style="font:800 64px/.9 Archivo,sans-serif;color:#D9491F;letter-spacing:-.01em">NÚCLEO<br>FIT</div>
+  </div>
+  <div class="thumb" data-thumb style="background:#F4EDE0;color:#3F4A34">
+    <svg class="scene" aria-hidden="true"><use href="#terra-scene"/></svg>
+    <div class="thumb-meta" style="position:relative"><span data-i18n="work.projects.terra.meta.0">9 EXPERIÊNCIAS</span><span data-i18n="work.projects.terra.meta.1">ALENTEJO</span></div>
+    <div style="position:relative;font:400 34px/1.05 Lora,serif;color:#F4EDE0" data-i18n="work.projects.terra.thumb">Terra Alentejana</div>
+  </div>
+</div>
+
+<main>
+
+<section id="topo" class="hero dark">
+  <div class="hero-in">
+    <p class="eyebrow" data-enter="line" style="margin-bottom:32px" data-i18n="hero.eyebrow">AGÊNCIA DE CRIAÇÃO DE WEBSITES</p>
+    <h1 data-enter="line" data-i18n="hero.title">Mais visibilidade online para o seu negócio — do zero, ou a partir do que já tem.</h1>
+    <div class="hero-row" data-enter="line">
+      <p class="lead" data-i18n="hero.lead">Seja para começar um site novo, dar mais qualidade ao que já existe nas redes ou no Google, ou refazer um site antigo — o objetivo é sempre o mesmo: a forma mais eficaz de o seu negócio aparecer.</p>
+      <div class="btns">
+        <a href="#portefolio" class="btn btn-solid" data-i18n="hero.ctaWork">Ver portefólio</a>
+        <a href="#contacto" class="btn btn-ghost" data-i18n="hero.ctaQuote">Pedir orçamento</a>
+      </div>
+    </div>
+  </div>
+  <div class="wordmark" aria-hidden="true"><span><span data-enter="letter">n</span></span><span><span data-enter="letter">i</span></span><span><span data-enter="letter">t</span></span><span><span data-enter="letter">e</span></span><span><span data-enter="letter">s</span><span class="wordmark-gem" data-gem data-gem-hero data-gem-color="#9AB0A0"></span></span><span><span data-enter="letter">c</span></span><span><span data-enter="letter">a</span></span></div>
+</section>
+
+<section id="porque" class="light">
+  <div class="wrap">
+    <div class="story">
+      <div class="story-text">
+        <p class="eyebrow" data-i18n="story.eyebrow">A HISTÓRIA</p>
+        <h2 class="h2" style="margin-bottom:32px;text-wrap:balance" data-i18n="story.title">Um nome que significa "começar a brilhar"</h2>
+        <p class="body-lg" data-i18n="story.body">Nitesca vem do latim nitescere, "começar a brilhar". Ligamos isso a um propósito simples: dar mais visibilidade a um negócio online — quer esteja a começar do zero, quer já tenha presença e precise que ela trabalhe melhor a seu favor.</p>
+      </div>
+      <div class="story-aside">
+        <span class="mark" data-gem data-gem-color="#6B7B6E" style="width:200px;height:200px"><span style="width:140px;height:140px;border-color:#6B7B6E"></span></span>
+        <div class="definition">
+          <p class="definition-word" lang="la">nitēscere</p>
+          <p class="definition-meaning" data-i18n="story.meaning">latim, verbo — começar a brilhar</p>
+        </div>
+      </div>
+    </div>
+    <div class="dont">
+      <h3 data-i18n="story.dontTitle">O que não fazemos</h3>
+      <p data-i18n="story.dontBody">Não trabalhamos com os modelos genéricos que as ferramentas de IA generativa produzem em segundos. Ficam de fora os gradientes chamativos sem razão de ser, os ícones de banco de imagens repetidos, os testemunhos inventados e as animações em cascata que só servem para parecer moderno. Cada site é desenhado à mão para o negócio específico que representa.</p>
+    </div>
+  </div>
+</section>
+
+<section id="servicos" class="dark">
+  <div class="wrap">
+    <p class="eyebrow"><span class="mark" data-gem data-gem-color="#9AB0A0" style="width:16px;height:16px"><span style="width:10px;height:10px;border-color:#9AB0A0"></span></span><span data-i18n="services.eyebrow">PACOTES</span></p>
+    <h2 class="h2" style="margin-bottom:64px" data-i18n="services.title">Três formas de começar</h2>
+    <div class="packages">
+      <!-- data-gem-pin: off the scroll path; the gem parks here only when a link to the package is clicked -->
+      <article id="pacote-basico" class="pkg">
+        <h3><span class="mark" data-gem-pin data-gem-color="#9AB0A0" style="width:16px;height:16px"><span style="width:10px;height:10px;border-color:#9AB0A0"></span></span><span data-i18n="services.packages.pacote-basico.name">Básico — institucional</span></h3>
+        <p class="pkg-price"><span class="pkg-from" data-i18n="services.packages.pacote-basico.from">a partir de</span><span data-i18n="services.packages.pacote-basico.price">300 €</span></p>
+        <p class="pkg-desc" data-i18n="services.packages.pacote-basico.desc">Para quem só precisa de existir online: quem é, o que faz, como contactar.</p>
+        <ul>
+          <li data-i18n="services.packages.pacote-basico.items.0">1 a 5 páginas</li>
+          <li data-i18n="services.packages.pacote-basico.items.1">Formulário de contacto e mapa</li>
+          <li data-i18n="services.packages.pacote-basico.items.2">Responsivo, SEO básico</li>
+        </ul>
+      </article>
+      <article id="pacote-intermedio" class="pkg">
+        <h3><span class="mark" data-gem-pin data-gem-color="#9AB0A0" style="width:16px;height:16px"><span style="width:10px;height:10px;border-color:#9AB0A0"></span></span><span data-i18n="services.packages.pacote-intermedio.name">Intermédio</span></h3>
+        <p class="pkg-price"><span class="pkg-from" data-i18n="services.packages.pacote-intermedio.from">a partir de</span><span data-i18n="services.packages.pacote-intermedio.price">600 €</span></p>
+        <p class="pkg-desc" data-i18n="services.packages.pacote-intermedio.desc">Tudo do Básico, mais o que precisa de marcações ou horários.</p>
+        <ul>
+          <li data-i18n="services.packages.pacote-intermedio.items.0">Calendário de marcações</li>
+          <li data-i18n="services.packages.pacote-intermedio.items.1">Galeria de fotos</li>
+          <li data-i18n="services.packages.pacote-intermedio.items.2">Blog ou notícias</li>
+        </ul>
+      </article>
+      <article id="pacote-catalogo" class="pkg">
+        <h3><span class="mark" data-gem-pin data-gem-color="#9AB0A0" style="width:16px;height:16px"><span style="width:10px;height:10px;border-color:#9AB0A0"></span></span><span data-i18n="services.packages.pacote-catalogo.name">Catálogo</span></h3>
+        <p class="pkg-price"><span class="pkg-from" data-i18n="services.packages.pacote-catalogo.from">calculado no orçamento</span><span data-i18n="services.packages.pacote-catalogo.price">Personalizado</span></p>
+        <p class="pkg-desc" data-i18n="services.packages.pacote-catalogo.desc">Para mostrar um catálogo de produtos ou serviços sem vender diretamente online.</p>
+        <ul>
+          <li data-i18n="services.packages.pacote-catalogo.items.0">Catálogo navegável com paginação</li>
+          <li data-i18n="services.packages.pacote-catalogo.items.1">Formulário de pedido de informação por item</li>
+          <li data-i18n="services.packages.pacote-catalogo.items.2">Sem carrinho nem pagamento</li>
+        </ul>
+      </article>
+    </div>
+    <p class="pkg-final"><span data-i18n="services.final">O valor final depende do número de páginas e do trabalho de conteúdo — e fica fechado na proposta, antes de começarmos.</span> <a href="#processo" data-i18n="services.finalLink">Ver como funciona</a></p>
+    <p class="note" data-i18n="services.note">Domínio, alojamento e manutenção calculados à parte, consoante o pacote.</p>
+  </div>
+</section>
+
+<section id="portefolio" class="light">
+  <div class="wrap">
+    <p class="eyebrow"><span class="mark" data-gem data-gem-color="#6B7B6E" style="width:16px;height:16px"><span style="width:10px;height:10px;border-color:#6B7B6E"></span></span><span data-i18n="work.eyebrow">EXEMPLOS</span></p>
+    <h2 class="h2" style="margin-bottom:24px" data-i18n="work.title">Um projeto para cada pacote</h2>
+    <p class="body-lg" style="margin-bottom:64px" data-i18n="work.intro">Como a Nitesca está a começar, estes três são projetos de demonstração — negócios fictícios, construídos por nós de raiz, para mostrar exatamente o que cada pacote entrega.</p>
+    <div class="works">
+      <div class="work" data-row data-site="portfolio/estudio-barro.html" data-name="Estúdio Barro">
+        <h3>Estúdio Barro</h3>
+        <p data-i18n="work.projects.barro.desc">Institucional · Ateliê de cerâmica em Évora</p>
+        <div class="work-links">
+          <a href="#pacote-basico" data-i18n="work.projects.barro.pkgLabel">Pacote Básico</a>
+          <a href="portfolio/estudio-barro.html" data-view data-i18n="work.view">Ver site</a>
+        </div>
+        <div class="work-thumb" aria-hidden="true" style="background:#E4D2B8;border:1px solid #cdbb9f;font:400 32px/1 Fraunces,serif;color:#A85C32" data-i18n="work.projects.barro.thumb">Ateliê de cerâmica</div>
+      </div>
+      <div class="work" data-row data-site="portfolio/nucleo-fit.html" data-name="Núcleo Fit">
+        <h3>Núcleo Fit</h3>
+        <p data-i18n="work.projects.nucleo.desc">Marcações · Personal training em Évora</p>
+        <div class="work-links">
+          <a href="#pacote-intermedio" data-i18n="work.projects.nucleo.pkgLabel">Pacote Intermédio</a>
+          <a href="portfolio/nucleo-fit.html" data-view data-i18n="work.view">Ver site</a>
+        </div>
+        <div class="work-thumb" aria-hidden="true" style="background:#1A1A18;font:800 48px/.9 Archivo,sans-serif;color:#D9491F" data-i18n="work.projects.nucleo.thumb">NÚCLEO FIT</div>
+      </div>
+      <div class="work" data-row data-site="portfolio/terra-alentejana.html" data-name="Terra Alentejana">
+        <h3>Terra Alentejana</h3>
+        <p data-i18n="work.projects.terra.desc">Catálogo · Agência de tours no Alentejo</p>
+        <div class="work-links">
+          <a href="#pacote-catalogo" data-i18n="work.projects.terra.pkgLabel">Pacote Catálogo</a>
+          <a href="portfolio/terra-alentejana.html" data-view data-i18n="work.view">Ver site</a>
+        </div>
+        <div class="work-thumb" aria-hidden="true" style="background:#F4EDE0;border:1px solid #d9ceb8;font:400 32px/1 Lora,serif;color:#F4EDE0;position:relative;overflow:hidden"><svg class="scene"><use href="#terra-scene"/></svg><span style="position:relative" data-i18n="work.projects.terra.thumb">Terra Alentejana</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="processo" class="dark">
+  <div class="wrap process">
+    <div class="process-head">
+      <p class="eyebrow" data-i18n="process.eyebrow">PROCESSO</p>
+      <h2 class="h2" style="max-width:12ch" data-i18n="process.title">Do primeiro contacto ao site no ar</h2>
+    </div>
+    <ol class="steps">
+      <li class="step">
+        <span class="mark step-mark" data-gem data-gem-color="#9AB0A0" style="width:24px;height:24px"><span style="width:14px;height:14px;border-color:#9AB0A0"></span></span>
+        <div><p class="step-n">01</p><h3 data-i18n="process.steps.0.title">Conversa inicial</h3><p class="step-text" data-i18n="process.steps.0.text">Percebemos o negócio e o que precisa de fazer online.</p></div>
+      </li>
+      <li class="step">
+        <span class="mark step-mark" data-gem data-gem-color="#9AB0A0" style="width:24px;height:24px"><span style="width:14px;height:14px;border-color:#9AB0A0"></span></span>
+        <div><p class="step-n">02</p><h3 data-i18n="process.steps.1.title">Proposta e preço fechado</h3><p class="step-text" data-i18n="process.steps.1.text">O ponto de partida do pacote passa a um valor exato, combinado consigo antes de qualquer trabalho começar. Sem surpresas depois.</p></div>
+      </li>
+      <li class="step">
+        <span class="mark step-mark" data-gem data-gem-color="#9AB0A0" style="width:24px;height:24px"><span style="width:14px;height:14px;border-color:#9AB0A0"></span></span>
+        <div><p class="step-n">03</p><h3 data-i18n="process.steps.2.title">Construção</h3><p class="step-text" data-i18n="process.steps.2.text">Acompanhamos com pontos de situação, não um silêncio de três semanas.</p></div>
+      </li>
+      <li class="step">
+        <span class="mark step-mark" data-gem data-gem-color="#9AB0A0" style="width:24px;height:24px"><span style="width:14px;height:14px;border-color:#9AB0A0"></span></span>
+        <div><p class="step-n">04</p><h3 data-i18n="process.steps.3.title">Entrega e manutenção</h3><p class="step-text" data-i18n="process.steps.3.text">O site fica no ar; manutenção mensal opcional para quem não quer preocupar-se mais com isso.</p></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="contacto" class="light">
+  <div class="wrap contact">
+    <div style="flex:1 1 360px">
+      <p class="eyebrow"><span class="mark" data-gem data-gem-color="#6B7B6E" style="width:16px;height:16px"><span style="width:10px;height:10px;border-color:#6B7B6E"></span></span><span data-i18n="contact.eyebrow">FALE CONNOSCO</span></p>
+      <h2 class="h2" style="margin-bottom:48px;max-width:12ch" data-i18n="contact.title">Vamos falar sobre o seu negócio</h2>
+      <div class="contact-info">
+        <span data-i18n="contact.email">[email a definir]</span>
+        <span data-i18n="contact.phone">[telefone a definir]</span>
+      </div>
+    </div>
+    <!-- ponytail: no backend yet — the form only confirms locally. Wire to an email/form service before launch. -->
+    <form class="form" data-contact-form>
+      <div class="form-row">
+        <label class="field"><span data-i18n="contact.fields.name">Nome</span><input name="nome" required autocomplete="name"></label>
+        <label class="field"><span data-i18n="contact.fields.email">Email</span><input name="email" type="email" required autocomplete="email"></label>
+      </div>
+      <label class="field"><span data-i18n="contact.fields.type">Tipo de negócio</span><input name="tipo" placeholder="Florista, contabilista, personal trainer…" data-i18n-attr="placeholder:contact.fields.typePlaceholder"></label>
+      <label class="field"><span data-i18n="contact.fields.message">Mensagem</span><textarea name="mensagem" rows="4" required></textarea></label>
+      <div class="form-actions">
+        <button type="submit" class="btn-dark" data-i18n="contact.send">Enviar</button>
+        <p role="status" style="margin:0;font-size:16px" data-form-status hidden data-i18n="contact.thanks">Obrigado — respondemos em breve.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer class="dark">
+  <div class="footer-in">
+    <div class="footer-top">
+      <p class="footer-logo" aria-label="Nitesca">nite<span class="logo-s">s<span class="footer-gem" data-gem data-gem-color="#9AB0A0"><span></span></span></span>ca</p>
+      <div class="footer-info">
+        <div><span data-i18n="contact.email">[email a definir]</span><span data-i18n="contact.phone">[telefone a definir]</span></div>
+        <div><span style="color:var(--sage)" data-i18n="footer.social">Redes sociais</span><span data-i18n="footer.tbd">[a definir]</span></div>
+      </div>
+    </div>
+    <p class="footer-copy">© 2026 Nitesca</p>
+  </div>
+</footer>
+
+<!-- Demo site window (site-preview.js): native <dialog> gives focus trap, Esc and backdrop -->
+<dialog class="browser" data-browser>
+  <div class="browser-bar">
+    <div class="browser-dots">
+      <button type="button" data-act="close" aria-label="Fechar" data-i18n-attr="aria-label:browser.close">×</button>
+      <button type="button" data-act="minimise" aria-label="Minimizar" data-i18n-attr="aria-label:browser.minimise">−</button>
+      <button type="button" data-act="max" aria-label="Ecrã inteiro" data-i18n-attr="aria-label:browser.fullscreen">+</button>
+    </div>
+    <div class="browser-nav">
+      <button type="button" data-act="back" aria-label="Retroceder" data-i18n-attr="aria-label:browser.back" disabled>←</button>
+      <button type="button" data-act="forward" aria-label="Avançar" data-i18n-attr="aria-label:browser.forward" disabled>→</button>
+      <button type="button" data-act="reload" aria-label="Recarregar" data-i18n-attr="aria-label:browser.reload">↻</button>
+    </div>
+    <div class="browser-url"><span class="browser-lock" aria-hidden="true">●</span><span data-url></span></div>
+    <button type="button" class="browser-close" data-act="close" aria-label="Fechar" data-i18n-attr="aria-label:browser.close">✕</button>
+  </div>
+  <iframe title=""></iframe>
+</dialog>
+<button type="button" class="browser-chip" data-chip hidden><span aria-hidden="true">▢</span> <span data-chip-name></span></button>
+
+<script type="module" src="/src/main.js"></script>
 </body>
 </html>

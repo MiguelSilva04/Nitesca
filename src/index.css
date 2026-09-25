@@ -17,6 +17,7 @@ html { -webkit-text-size-adjust: 100% }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth } }
 body { margin: 0; background: var(--teal); color: var(--cream); font-family: var(--sans); -webkit-font-smoothing: antialiased }
 * { box-sizing: border-box }
+[hidden] { display: none !important }
 a { color: inherit; text-underline-offset: .22em; text-decoration-thickness: 1px }
 a:hover { text-decoration-thickness: 2px }
 :focus-visible { outline: 2px solid var(--sage); outline-offset: 4px }
@@ -39,6 +40,7 @@ section[id] { scroll-margin-top: 72px }
 .gem { position: fixed; left: 0; top: 0; width: 0; height: 0; background: var(--sage); z-index: 40; pointer-events: none; touch-action: none; will-change: transform }
 .preview { position: fixed; left: 0; top: 0; width: 360px; height: 232px; z-index: 45; pointer-events: none; opacity: 0; border-radius: 6px; overflow: hidden; box-shadow: 0 20px 40px -12px rgba(10, 25, 28, .45); will-change: transform }
 .thumb { position: absolute; inset: 0; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; opacity: 0; transition: opacity .25s }
+.scene { position: absolute; inset: 0; width: 100%; height: 100% }
 .thumb-meta { display: flex; justify-content: space-between; font: 600 11px/1 var(--sans); letter-spacing: .14em }
 
 /* Header */
@@ -82,7 +84,7 @@ section[id] { scroll-margin-top: 72px }
 /* Serviços */
 .packages { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 0 48px }
 .pkg { padding: 40px 0; border-top: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 96px }
-.pkg h3 { margin: 0; font: 500 18px/1.3 var(--sans) }
+.pkg h3 { margin: 0; display: flex; align-items: center; gap: 12px; font: 500 18px/1.3 var(--sans) }
 .pkg-price { margin: 0; font: 400 clamp(40px, 11vw, 48px)/1 var(--serif); letter-spacing: -.01em }
 .pkg-from { display: block; margin-bottom: 10px; font: 500 14px/1 var(--sans); letter-spacing: 0; color: var(--sage) }
 .pkg-final { margin: 32px 0 0; padding-top: 24px; border-top: 1px solid var(--line-2); font-size: 18px; line-height: 1.55; max-width: 62ch; text-wrap: pretty }

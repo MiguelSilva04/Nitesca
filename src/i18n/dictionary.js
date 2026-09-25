@@ -1,5 +1,6 @@
 // Every user-facing string on the site, in both languages. Keys must match between `pt` and `en`.
-// Package keys match `packages[].id` and project keys match `projects[].id` in data.js.
+// index.html references them by path (data-i18n="services.packages.pacote-basico.name");
+// `npm run check:i18n` verifies both languages match and every path in the HTML exists.
 
 export const dict = {
   pt: {
@@ -61,7 +62,7 @@ export const dict = {
       intro: 'Como a Nitesca está a começar, estes três são projetos de demonstração — negócios fictícios, construídos por nós de raiz, para mostrar exatamente o que cada pacote entrega.',
       view: 'Ver site',
       projects: {
-        barro: { desc: 'Institucional · Ateliê de cerâmica em Évora', pkgLabel: 'Pacote Básico', thumb: 'Ateliê de cerâmica', meta: ['ESTÚDIO BARRO', 'ÉVORA'] },
+        barro: { desc: 'Institucional · Ateliê de cerâmica em Évora', pkgLabel: 'Pacote Básico', thumb: 'Ateliê de cerâmica', meta: ['PEÇAS FEITAS À MÃO', 'ÉVORA'] },
         nucleo: { desc: 'Marcações · Personal training em Évora', pkgLabel: 'Pacote Intermédio', thumb: 'NÚCLEO FIT', meta: ['SESSÃO EXPERIMENTAL', 'SEG–SEX 07–21H'] },
         terra: { desc: 'Catálogo · Agência de tours no Alentejo', pkgLabel: 'Pacote Catálogo', thumb: 'Terra Alentejana', meta: ['9 EXPERIÊNCIAS', 'ALENTEJO'] },
       },
@@ -157,7 +158,7 @@ export const dict = {
       intro: 'Nitesca is just getting started, so these three are demo projects — fictional businesses, built by us from scratch, to show exactly what each package delivers.',
       view: 'View site',
       projects: {
-        barro: { desc: 'Company site · Ceramics studio in Évora', pkgLabel: 'Basic package', thumb: 'Ceramics studio', meta: ['ESTÚDIO BARRO', 'ÉVORA'] },
+        barro: { desc: 'Company site · Ceramics studio in Évora', pkgLabel: 'Basic package', thumb: 'Ceramics studio', meta: ['HANDMADE PIECES', 'ÉVORA'] },
         nucleo: { desc: 'Bookings · Personal training in Évora', pkgLabel: 'Intermediate package', thumb: 'NÚCLEO FIT', meta: ['TRIAL SESSION', 'MON–FRI 7AM–9PM'] },
         terra: { desc: 'Catalogue · Tour agency in the Alentejo', pkgLabel: 'Catalogue package', thumb: 'Terra Alentejana', meta: ['9 EXPERIENCES', 'ALENTEJO'] },
       },
