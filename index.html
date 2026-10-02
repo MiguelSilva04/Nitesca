@@ -3,33 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nitesca</title>
+<title data-i18n="meta.title">Nitesca</title>
+<meta name="description" content="Mais visibilidade online para o seu negócio — do zero, ou a partir do que já tem." data-i18n-attr="content:meta.description">
+<link rel="canonical" href="https://nitesca.com/" data-i18n-attr="href:meta.url">
+<link rel="alternate" hreflang="pt-PT" href="https://nitesca.com/">
+<link rel="alternate" hreflang="en" href="https://nitesca.com/en/">
+<link rel="alternate" hreflang="x-default" href="https://nitesca.com/">
+<meta name="theme-color" content="#16333A">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="description" content="Mais visibilidade online para o seu negócio — do zero, ou a partir do que já tem.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Hanken+Grotesk:wght@400;500;600&family=Fraunces:opsz@9..144&family=Archivo:wght@800&family=Lora&display=swap">
+<!-- Social previews (crawlers don't run JS; scripts/prerender.mjs writes the English values into /en/) -->
+<meta property="og:site_name" content="Nitesca">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Nitesca" data-i18n-attr="content:meta.title">
+<meta property="og:description" content="Mais visibilidade online para o seu negócio — do zero, ou a partir do que já tem." data-i18n-attr="content:meta.description">
+<meta property="og:url" content="https://nitesca.com/" data-i18n-attr="content:meta.url">
+<meta property="og:locale" content="pt_PT" data-i18n-attr="content:meta.ogLocale">
+<meta property="og:locale:alternate" content="en_GB" data-i18n-attr="content:meta.ogLocaleAlt">
+<meta property="og:image" content="https://nitesca.com/og/nitesca-pt.jpg" data-i18n-attr="content:meta.ogImage">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Nitesca — Mais visibilidade online para o seu negócio" data-i18n-attr="content:meta.ogImageAlt">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json" data-jsonld>{}</script>
+<!-- Above-the-fold fonts; the rest load on demand via unicode-range -->
+<link rel="preload" href="/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-  /* Set before first paint by the script below; main.js clears them once it has taken over. */
-  .i18n-pending body { visibility: hidden }
-  .enter-pending [data-enter="line"] { opacity: 0 }
+  /* Hero entrance starts pre-shifted (transform only, never opacity, so LCP paints immediately); gem.js clears it. */
+  .enter-pending [data-enter="line"] { transform: translateY(24px) }
   .enter-pending [data-enter="letter"] { transform: translateY(100%) }
 </style>
 <script>
-  // HTML ships in Portuguese. Hide the page for the few ms it takes main.js to swap in English
-  // (saved choice, else non-Portuguese browsers), and pre-hide the hero entrance so it doesn't flash.
   (function (h) {
-    try {
-      var saved = localStorage.getItem('nitesca-lang')
-      var lang = saved || ((navigator.language || 'pt').toLowerCase().indexOf('pt') === 0 ? 'pt' : 'en')
-      if (lang === 'en') h.classList.add('i18n-pending')
-    } catch (e) {}
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches) h.classList.add('enter-pending')
-    setTimeout(function () { h.classList.remove('i18n-pending', 'enter-pending') }, 2000) // never stay hidden if JS fails
+    setTimeout(function () { h.classList.remove('enter-pending') }, 2000) // never stay shifted if JS fails
   })(document.documentElement)
 </script>
 </head>
 <body>
+<a class="skip" href="#conteudo" data-skip data-i18n="a11y.skip">Saltar para o conteúdo</a>
 
 <header class="header">
   <div class="header-in">
@@ -47,10 +59,10 @@
 </header>
 
 <!-- Language switcher: a dictionary thumb-index tab on the page edge -->
-<div class="lang-tab" role="group" aria-label="Idioma" data-i18n-attr="aria-label:lang.group">
-  <button type="button" lang="pt" data-lang="pt" aria-pressed="true"><span class="lang-gem" aria-hidden="true"></span><span class="lang-code">pt</span><span class="lang-name" aria-hidden="true">português</span></button>
-  <button type="button" lang="en" data-lang="en" aria-pressed="false"><span class="lang-gem" aria-hidden="true"></span><span class="lang-code">en</span><span class="lang-name" aria-hidden="true">English</span></button>
-</div>
+<nav class="lang-tab" aria-label="Idioma" data-i18n-attr="aria-label:lang.group">
+  <a href="/" hreflang="pt-PT" lang="pt" data-lang="pt" aria-current="page"><span class="lang-gem" aria-hidden="true"></span><span class="lang-code">pt</span> <span class="lang-name">português</span></a>
+  <a href="/en/" hreflang="en" lang="en" data-lang="en"><span class="lang-gem" aria-hidden="true"></span><span class="lang-code">en</span> <span class="lang-name">English</span></a>
+</nav>
 
 <!-- Floating gem: travels between every [data-gem] anchor as you scroll (gem.js) -->
 <div class="gem" data-gem-el aria-hidden="true"></div>
@@ -93,7 +105,7 @@
   </div>
 </div>
 
-<main>
+<main id="conteudo" tabindex="-1">
 
 <section id="topo" class="hero dark">
   <div class="hero-in">
@@ -181,30 +193,30 @@
     <h2 class="h2" style="margin-bottom:24px" data-i18n="work.title">Um projeto para cada pacote</h2>
     <p class="body-lg" style="margin-bottom:64px" data-i18n="work.intro">Como a Nitesca está a começar, estes três são projetos de demonstração — negócios fictícios, construídos por nós de raiz, para mostrar exatamente o que cada pacote entrega.</p>
     <div class="works">
-      <div class="work" data-row data-site="portfolio/estudio-barro.html" data-name="Estúdio Barro">
+      <div class="work" data-row data-site="/portfolio/estudio-barro.html" data-name="Estúdio Barro">
         <h3>Estúdio Barro</h3>
         <p data-i18n="work.projects.barro.desc">Institucional · Ateliê de cerâmica em Évora</p>
         <div class="work-links">
           <a href="#pacote-basico" data-i18n="work.projects.barro.pkgLabel">Pacote Básico</a>
-          <a href="portfolio/estudio-barro.html" data-view data-i18n="work.view">Ver site</a>
+          <a href="/portfolio/estudio-barro.html" data-view data-i18n="work.view">Ver site</a>
         </div>
         <div class="work-thumb" aria-hidden="true" style="background:#E4D2B8;border:1px solid #cdbb9f;font:400 32px/1 Fraunces,serif;color:#A85C32" data-i18n="work.projects.barro.thumb">Ateliê de cerâmica</div>
       </div>
-      <div class="work" data-row data-site="portfolio/nucleo-fit.html" data-name="Núcleo Fit">
+      <div class="work" data-row data-site="/portfolio/nucleo-fit.html" data-name="Núcleo Fit">
         <h3>Núcleo Fit</h3>
         <p data-i18n="work.projects.nucleo.desc">Marcações · Personal training em Évora</p>
         <div class="work-links">
           <a href="#pacote-intermedio" data-i18n="work.projects.nucleo.pkgLabel">Pacote Intermédio</a>
-          <a href="portfolio/nucleo-fit.html" data-view data-i18n="work.view">Ver site</a>
+          <a href="/portfolio/nucleo-fit.html" data-view data-i18n="work.view">Ver site</a>
         </div>
         <div class="work-thumb" aria-hidden="true" style="background:#1A1A18;font:800 48px/.9 Archivo,sans-serif;color:#D9491F" data-i18n="work.projects.nucleo.thumb">NÚCLEO FIT</div>
       </div>
-      <div class="work" data-row data-site="portfolio/terra-alentejana.html" data-name="Terra Alentejana">
+      <div class="work" data-row data-site="/portfolio/terra-alentejana.html" data-name="Terra Alentejana">
         <h3>Terra Alentejana</h3>
         <p data-i18n="work.projects.terra.desc">Catálogo · Agência de tours no Alentejo</p>
         <div class="work-links">
           <a href="#pacote-catalogo" data-i18n="work.projects.terra.pkgLabel">Pacote Catálogo</a>
-          <a href="portfolio/terra-alentejana.html" data-view data-i18n="work.view">Ver site</a>
+          <a href="/portfolio/terra-alentejana.html" data-view data-i18n="work.view">Ver site</a>
         </div>
         <div class="work-thumb" aria-hidden="true" style="background:#F4EDE0;border:1px solid #d9ceb8;font:400 32px/1 Lora,serif;color:#F4EDE0;position:relative;overflow:hidden"><svg class="scene"><use href="#terra-scene"/></svg><span style="position:relative" data-i18n="work.projects.terra.thumb">Terra Alentejana</span></div>
       </div>

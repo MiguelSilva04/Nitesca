@@ -1,5 +1,6 @@
+import './fonts.css'
 import './index.css'
-import { initLang } from './lang.js'
+import { initLang, t } from './lang.js'
 import { initGem } from './gem.js'
 import { initSitePreview } from './site-preview.js'
 
@@ -23,8 +24,21 @@ document.querySelectorAll('[data-row]').forEach((row, k) => {
   })
 })
 
+// Fonts only the portfolio preview cards use: fetch once the page has loaded, off the critical path.
+addEventListener('load', () => setTimeout(() => {
+  for (const f of ['400 40px Fraunces', '400 40px Lora', '800 40px Archivo']) document.fonts.load(f)
+}, 0))
+
 // ponytail: no backend yet — the form only confirms locally. Wire to an email/form service before launch.
 const form = document.querySelector('[data-contact-form]')
+// Validation messages in the page's language instead of the browser's.
+form.querySelectorAll('input, textarea').forEach(field => {
+  field.addEventListener('invalid', () => {
+    const e = t().contact.errors
+    field.setCustomValidity(field.validity.valueMissing ? e.required : field.validity.typeMismatch ? e.email : '')
+  })
+  field.addEventListener('input', () => field.setCustomValidity(''))
+})
 form.addEventListener('submit', ev => {
   ev.preventDefault()
   form.querySelector('[data-form-status]').hidden = false

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  // Must match the Worker's name in the Cloudflare dashboard, or a new Worker gets created.
+  "name": "nitesca",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    // Real 404 status with dist/404.html instead of the home page with 200.
+    "not_found_handling": "404-page",
+    // /en -> /en/ (each language is a folder with index.html).
+    "html_handling": "auto-trailing-slash"
+  },
+  // Only nitesca.com serves the site: no duplicate copy on *.workers.dev competing in search.
+  "workers_dev": false,
+  "preview_urls": false
+}

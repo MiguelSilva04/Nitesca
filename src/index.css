@@ -18,11 +18,15 @@ html { -webkit-text-size-adjust: 100% }
 body { margin: 0; background: var(--teal); color: var(--cream); font-family: var(--sans); -webkit-font-smoothing: antialiased }
 * { box-sizing: border-box }
 [hidden] { display: none !important }
+/* Skip link: off-screen until focused */
+.skip { position: absolute; left: 16px; top: -100px; z-index: 100; padding: 12px 18px; background: var(--cream); color: var(--teal); font-weight: 600; border-radius: 3px; text-decoration: none }
+.skip:focus { top: 12px }
+main:focus { outline: none }
 a { color: inherit; text-underline-offset: .22em; text-decoration-thickness: 1px }
 a:hover { text-decoration-thickness: 2px }
 :focus-visible { outline: 2px solid var(--sage); outline-offset: 4px }
 ::selection { background: var(--sage); color: var(--teal) }
-input::placeholder, textarea::placeholder { color: #5b6f73 }
+input::placeholder, textarea::placeholder { color: #526568 } /* 4.6:1 on cream */
 
 /* Shared */
 .dark { background: var(--teal); color: var(--cream) }
@@ -46,7 +50,7 @@ section[id] { scroll-margin-top: 72px }
 /* Header */
 .header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; height: 72px; background: var(--teal); border-bottom: 1px solid var(--line) }
 .header-in { max-width: 1280px; height: 100%; margin: 0 auto; padding: 0 var(--pad); display: flex; align-items: center; justify-content: space-between; gap: 24px }
-.logo { text-decoration: none; font: 400 28px/1 var(--logo); color: var(--cream); letter-spacing: .03em; display: flex; align-items: baseline }
+.logo { padding: 8px 0; margin: -8px 0; /* 44px touch target, same layout */ text-decoration: none; font: 400 28px/1 var(--logo); color: var(--cream); letter-spacing: .03em; display: flex; align-items: baseline }
 .logo-s { position: relative; display: inline-block; line-height: 1 }
 .logo-dot { position: absolute; left: 50%; bottom: .82em; width: .17em; height: .17em; background: var(--sage); transform: translateX(-50%) rotate(45deg) }
 .header-right { display: flex; align-items: center; gap: 32px }
@@ -164,19 +168,19 @@ section[id] { scroll-margin-top: 72px }
 
 /* Language switcher: a dictionary thumb-index tab on the right edge */
 .lang-tab { position: fixed; right: 0; top: 50%; transform: translateY(-50%); z-index: 55; display: flex; flex-direction: column; padding: 6px 0; background: var(--teal); border: 1px solid var(--line-2); border-right: 0; border-radius: 12px 0 0 12px; box-shadow: -8px 10px 30px -14px rgba(0, 0, 0, .55) }
-.lang-tab button { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px 0 12px; border: 0; background: none; color: var(--sage); font: italic 400 19px/1 var(--serif); cursor: pointer; transition: color .2s }
-.lang-tab button:hover, .lang-tab button[aria-pressed="true"] { color: var(--cream) }
-.lang-tab button + button { border-top: 1px solid var(--line) }
+.lang-tab a { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px 0 12px; color: var(--sage); font: italic 400 19px/1 var(--serif); text-decoration: none; transition: color .2s }
+.lang-tab a:hover, .lang-tab a[aria-current="page"] { color: var(--cream) }
+.lang-tab a + a { border-top: 1px solid var(--line) }
 .lang-gem { width: 7px; height: 7px; flex: none; background: var(--sage); transform: rotate(45deg) scale(0); transition: transform .3s cubic-bezier(.2, .8, .2, 1) }
-.lang-tab button[aria-pressed="true"] .lang-gem { transform: rotate(45deg) scale(1) }
+.lang-tab a[aria-current="page"] .lang-gem { transform: rotate(45deg) scale(1) }
 .lang-name { max-width: 0; overflow: hidden; white-space: nowrap; opacity: 0; font: 500 13px/1 var(--sans); transition: max-width .35s cubic-bezier(.2, .8, .2, 1), opacity .25s }
 .lang-tab:hover .lang-name, .lang-tab:focus-within .lang-name { max-width: 90px; opacity: 1 }
 /* Phones: a slim edge tab (codes only) so it barely reaches into the 24px gutter */
 @media (max-width: 599px) {
   .lang-tab { padding: 4px 0; border-radius: 8px 0 0 8px }
-  .lang-tab button { height: 38px; padding: 0 8px; font-size: 16px; gap: 0 }
+  .lang-tab a { height: 44px; min-width: 44px; justify-content: center; padding: 0 8px; font-size: 16px; gap: 0 }
   .lang-gem, .lang-name { display: none }
-  .lang-tab button[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px }
+  .lang-tab a[aria-current="page"] { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px }
 }
 /* Page cross-fade when switching language (View Transitions API) */
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .35s }
@@ -206,3 +210,4 @@ html:has(dialog[open]) { overflow: hidden }
 .browser iframe { flex: 1; width: 100%; border: 0; background: #fff }
 .browser-chip { position: fixed; left: 16px; bottom: 16px; z-index: 60; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--teal); color: var(--cream); font: 600 14px/1 var(--sans); box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .5); cursor: pointer }
 @media (max-width: 599px) { .browser-dots { display: none } }
+@media (pointer: coarse) { .browser-bar button { width: 44px; height: 44px } .browser-bar { gap: 6px } }

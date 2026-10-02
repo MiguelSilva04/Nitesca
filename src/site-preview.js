@@ -39,7 +39,7 @@ export function initSitePreview() {
     if (!project) return
     const b = t().browser
     const current = hist.list[hist.i] ? new URL(hist.list[hist.i]).hash : ''
-    url.textContent = `nitesca.com/${b.path}/` + project.site.replace(/^portfolio\/|\.html$/g, '') + current
+    url.textContent = `nitesca.com/${b.path}/` + project.site.replace(/^\/?portfolio\/|\.html$/g, '') + current
     backBtn.disabled = hist.i <= 0
     fwdBtn.disabled = hist.i >= hist.list.length - 1
     maxBtn.setAttribute('aria-label', max ? b.exitFullscreen : b.fullscreen)

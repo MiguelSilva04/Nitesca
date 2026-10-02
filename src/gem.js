@@ -137,6 +137,8 @@ export function initGem({ gemMotion = 'viagem', cursorPreview = true } = {}) {
     p.op += ((show ? 1 : 0) - p.op) * (reduced ? 1 : 0.2)
     if (!show && p.op < 0.01) { p.op = 0; p.init = false }
     preview.style.opacity = p.op
+    // display:none while hidden, so its decorative fonts aren't fetched during page load
+    preview.style.display = p.op ? '' : 'none'
     preview.style.transform = `translate3d(${p.x}px,${p.y}px,0) rotate(${reduced ? 0 : p.rot}deg) scale(${0.9 + 0.1 * p.op})`
     thumbs.forEach((th, idx) => { th.style.opacity = idx === s.active ? 1 : 0 })
   }
@@ -144,7 +146,8 @@ export function initGem({ gemMotion = 'viagem', cursorPreview = true } = {}) {
   // In-page links scroll so the target section's gem lands exactly where the gem rests.
   document.addEventListener('click', ev => {
     const a = ev.target.closest?.('a[href^="#"]')
-    if (!a || ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey) return
+    if (!a || a.hasAttribute('data-skip')) return // skip link: plain jump so focus lands in <main>
+    if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey) return
     const href = a.getAttribute('href')
     const sec = document.getElementById(decodeURIComponent(href.slice(1))) // null for a bare "#"
     // A section's own stop wins; pins only apply to targets without one (the package cards).
@@ -201,7 +204,7 @@ export function initGem({ gemMotion = 'viagem', cursorPreview = true } = {}) {
   // fill: 'backwards' covers each delay, so the class can go as soon as the animations exist.
   if (!rm.matches) {
     document.querySelectorAll('[data-enter="line"]').forEach((el, i) => el.animate(
-      [{ opacity: 0, transform: 'translateY(24px)' }, { opacity: 1, transform: 'none' }],
+      [{ transform: 'translateY(24px)' }, { transform: 'none' }], // transform only: opacity would delay LCP
       { duration: 900, delay: 100 + i * 120, easing: 'cubic-bezier(.2,.7,.1,1)', fill: 'backwards' }))
     document.querySelectorAll('[data-enter="letter"]').forEach((el, i) => el.animate(
       [{ transform: 'translateY(100%)' }, { transform: 'none' }],

@@ -1,23 +1,18 @@
-import { dict, languages } from './i18n/dictionary.js'
+import { dict } from './i18n/dictionary.js'
 
-// The HTML ships in Portuguese with every string tagged:
+// The URL decides the language: "/" is Portuguese, "/en/" is English. Both are full static HTML
+// (scripts/prerender.mjs bakes the English copy at build time), so crawlers see each language
+// at its own address. Every string in index.html is tagged:
 //   data-i18n="hero.title"                 → textContent
 //   data-i18n-attr="aria-label:header.home" → attributes (several separated by ";")
-// Switching language rewrites those nodes from the dictionary.
+// Clicking the language tab swaps the text in place and pushes the other URL; no reload.
 
-const KEY = 'nitesca-lang'
+const PATHS = { pt: '/', en: '/en/' }
 const listeners = []
 const get = (obj, path) => path.split('.').reduce((o, k) => o?.[k], obj)
+const langFromPath = () => (location.pathname.startsWith('/en') ? 'en' : 'pt')
 
-function initialLang() {
-  try {
-    const saved = localStorage.getItem(KEY)
-    if (saved in dict) return saved
-  } catch { /* storage blocked */ }
-  return (navigator.language || 'pt').toLowerCase().startsWith('pt') ? 'pt' : 'en'
-}
-
-let lang = initialLang()
+let lang = langFromPath()
 
 export const t = () => dict[lang]
 export const onLangChange = fn => listeners.push(fn)
@@ -31,7 +26,7 @@ function apply() {
   }
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const v = text(el.dataset.i18n)
-    if (v != null) el.textContent = v
+    if (v != null && el.textContent !== v) el.textContent = v
   })
   document.querySelectorAll('[data-i18n-attr]').forEach(el => {
     for (const pair of el.dataset.i18nAttr.split(';')) {
@@ -41,29 +36,29 @@ function apply() {
     }
   })
   document.documentElement.lang = tr.meta.htmlLang
-  document.title = tr.meta.title
-  document.querySelector('meta[name="description"]')?.setAttribute('content', tr.meta.description)
-
-  for (const btn of document.querySelectorAll('.lang-tab [data-lang]')) {
-    const on = btn.dataset.lang === lang
-    const name = languages.find(l => l.code === btn.dataset.lang).name
-    btn.setAttribute('aria-pressed', on)
-    btn.setAttribute('aria-label', on ? name : `${tr.lang.switchTo} ${name}`)
+  for (const link of document.querySelectorAll('.lang-tab [data-lang]')) {
+    if (link.dataset.lang === lang) link.setAttribute('aria-current', 'page')
+    else link.removeAttribute('aria-current')
   }
   listeners.forEach(fn => fn(tr))
 }
 
-export function setLang(next) {
-  if (next === lang || !(next in dict)) return
+function show(next) {
   lang = next
-  try { localStorage.setItem(KEY, next) } catch { /* storage blocked */ }
   // Cross-fade the whole page between languages where the browser supports it.
   if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(apply)
   else apply()
 }
 
 export function initLang() {
-  document.querySelectorAll('.lang-tab [data-lang]').forEach(btn => btn.addEventListener('click', () => setLang(btn.dataset.lang)))
-  apply()
-  document.documentElement.classList.remove('i18n-pending')
+  document.querySelectorAll('.lang-tab [data-lang]').forEach(link => link.addEventListener('click', ev => {
+    if (ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return // let the browser open a tab
+    ev.preventDefault()
+    const next = link.dataset.lang
+    if (next === lang) return
+    history.pushState(null, '', PATHS[next] + location.hash)
+    show(next)
+  }))
+  addEventListener('popstate', () => { if (langFromPath() !== lang) show(langFromPath()) })
+  apply() // no-op on the built pages; translates "/en/" on the dev server, which only has the PT file
 }
