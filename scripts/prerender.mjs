@@ -4,6 +4,8 @@
 //   dist/en/index.html   EN, every data-i18n / data-i18n-attr string swapped from the dictionary
 //   dist/sitemap.xml     both URLs with hreflang alternates
 //   dist/404.html        noindex, bilingual
+//   dist/llms.txt        plain-language summary for AI agents (llmstxt.org)
+// The stylesheet is inlined into both pages: it's ~4.5 KB gzipped and saves a render-blocking request.
 // It fails the build if any tagged string can't be translated, so a page never ships half-translated.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { dict } from '../src/i18n/dictionary.js'
@@ -11,6 +13,9 @@ import { dict } from '../src/i18n/dictionary.js'
 const DIST = new URL('../dist/', import.meta.url)
 const ORIGIN = 'https://nitesca.com'
 const template = readFileSync(new URL('index.html', DIST), 'utf8')
+const cssTag = template.match(/<link rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/)
+if (!cssTag) { console.error('prerender: no stylesheet link in dist/index.html'); process.exit(1) }
+const inlineCss = `<style>${readFileSync(new URL('.' + cssTag[1], DIST), 'utf8')}</style>`
 
 const get = (obj, path) => path.split('.').reduce((o, k) => o?.[k], obj)
 const esc = v => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -70,6 +75,7 @@ function render(lang) {
   html = html
     .replace('<html lang="pt-PT">', `<html lang="${tr.meta.htmlLang}">`)
     .replace(/<script type="application\/ld\+json" data-jsonld>[^<]*<\/script>/, `<script type="application/ld+json" data-jsonld>${jsonLd(tr)}</script>`)
+  html = html.replace(cssTag[0], inlineCss)
   if (lang !== 'pt') {
     html = html
       .replace('data-lang="pt" aria-current="page"', 'data-lang="pt"')
@@ -99,8 +105,7 @@ ${['/', '/en/'].map(path => `  <url>
 `)
 
 // 404: same stylesheet (fonts, colours, buttons), no JS, both languages.
-const css = (template.match(/<link rel="stylesheet"[^>]*href="([^"]+)"/) || [])[1]
-if (!css) fail('could not find the built stylesheet in dist/index.html')
+const css = cssTag[1]
 writeFileSync(new URL('404.html', DIST), `<!DOCTYPE html>
 <html lang="pt-PT">
 <head>
@@ -125,4 +130,39 @@ writeFileSync(new URL('404.html', DIST), `<!DOCTYPE html>
 </body>
 </html>
 `)
-console.log(`prerender: wrote index.html, en/index.html, sitemap.xml, 404.html`)
+// llms.txt — generated from the dictionary so prices and copy never drift from the site.
+const pt = dict.pt, en = dict.en
+const pkgLines = tr => Object.values(tr.services.packages).map(p => `- **${p.name}** (${/\d/.test(p.price) ? `${p.from} ${p.price}` : `${p.price}, ${p.from}`}): ${p.desc} ${p.items.join('; ')}.`).join('\n')
+writeFileSync(new URL('llms.txt', DIST), `# Nitesca
+
+> ${pt.meta.description} / ${en.meta.description}
+
+${pt.hero.lead}
+
+## Páginas / Pages
+
+- [Nitesca — português](${ORIGIN}/): ${pt.hero.eyebrow.toLowerCase()}
+- [Nitesca — English](${ORIGIN}/en/): ${en.hero.eyebrow.toLowerCase()}
+
+## ${pt.services.eyebrow.charAt(0) + pt.services.eyebrow.slice(1).toLowerCase()}
+
+${pkgLines(pt)}
+
+${pt.services.final} ${pt.services.note}
+
+## ${en.services.eyebrow.charAt(0) + en.services.eyebrow.slice(1).toLowerCase()}
+
+${pkgLines(en)}
+
+${en.services.final} ${en.services.note}
+
+## ${pt.process.title}
+
+${pt.process.steps.map((s, i) => `${i + 1}. **${s.title}** — ${s.text}`).join('\n')}
+
+## Contacto / Contact
+
+- [${pt.contact.title}](${ORIGIN}/#contacto)
+- [${en.contact.title}](${ORIGIN}/en/#contacto)
+`)
+console.log(`prerender: wrote index.html, en/index.html, sitemap.xml, 404.html, llms.txt (stylesheet inlined)`)
