@@ -45,6 +45,7 @@ function jsonLd(tr) {
     description: tr.meta.description,
     inLanguage: tr.meta.htmlLang,
     image: tr.meta.ogImage,
+    email: 'geral@nitesca.com',
     makesOffer: offers,
   }
   return JSON.stringify(data).replace(/</g, '\\u003c') // never close the <script> early
@@ -161,6 +162,8 @@ ${en.services.final} ${en.services.note}
 ${pt.process.steps.map((s, i) => `${i + 1}. **${s.title}** — ${s.text}`).join('\n')}
 
 ## Contacto / Contact
+
+- Email: geral@nitesca.com
 
 - [${pt.contact.title}](${ORIGIN}/#contacto)
 - [${en.contact.title}](${ORIGIN}/en/#contacto)

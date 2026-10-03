@@ -128,6 +128,8 @@ section[id] { scroll-margin-top: 72px }
 /* Contacto */
 .contact { display: flex; flex-wrap: wrap; gap: 64px 96px }
 .contact-info { display: flex; flex-direction: column; gap: 8px; font-size: 18px; line-height: 1.5 }
+/* Email link: 44px tap height without moving the layout */
+.mail { align-self: flex-start; padding: 10px 0; margin: -10px 0 }
 .form { flex: 1 1 440px; display: flex; flex-direction: column; gap: 32px }
 .form-row { display: flex; flex-wrap: wrap; gap: 32px }
 .form-row .field { flex: 1 1 220px }

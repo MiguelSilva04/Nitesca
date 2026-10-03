@@ -85,7 +85,6 @@ export const dict = {
     contact: {
       eyebrow: 'FALE CONNOSCO',
       title: 'Vamos falar sobre o seu negócio',
-      email: '[email a definir]',
       phone: '[telefone a definir]',
       fields: {
         name: 'Nome', email: 'Email', type: 'Tipo de negócio',
@@ -95,7 +94,7 @@ export const dict = {
       thanks: 'Obrigado — respondemos em breve.',
       errors: { required: 'Preencha este campo.', email: 'Indique um endereço de email válido.' },
     },
-    footer: { social: 'Redes sociais', tbd: '[a definir]' },
+    footer: { social: 'Redes sociais', tbd: 'Em breve' },
     browser: {
       path: 'exemplos',
       demo: 'site de demonstração',
@@ -187,7 +186,6 @@ export const dict = {
     contact: {
       eyebrow: 'GET IN TOUCH',
       title: 'Let’s talk about your business',
-      email: '[email TBD]',
       phone: '[phone TBD]',
       fields: {
         name: 'Name', email: 'Email', type: 'Type of business',
@@ -197,7 +195,7 @@ export const dict = {
       thanks: 'Thank you — we’ll be in touch soon.',
       errors: { required: 'Please fill in this field.', email: 'Please enter a valid email address.' },
     },
-    footer: { social: 'Social media', tbd: '[TBD]' },
+    footer: { social: 'Social media', tbd: 'Coming soon' },
     browser: {
       path: 'examples',
       demo: 'demo site',
