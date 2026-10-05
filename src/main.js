@@ -29,8 +29,13 @@ addEventListener('load', () => setTimeout(() => {
   for (const f of ['400 40px Fraunces', '400 40px Lora', '800 40px Archivo']) document.fonts.load(f)
 }, 0))
 
-// No backend: the form opens the visitor's email app with a message to geral@nitesca.com already written.
+// Contact form → POST /api/contact (worker/index.js) → email to geral@nitesca.com.
 const form = document.querySelector('[data-contact-form]')
+const status = form.querySelector('[data-form-status]')
+const sendBtn = form.querySelector('[type=submit]')
+const openedAt = Date.now() // the Worker drops forms sent implausibly fast (bots)
+// Messages carry their dictionary key, so switching language re-translates them too.
+const say = (el, key) => { el.dataset.i18n = key; el.textContent = key.split('.').reduce((o, k) => o[k], t()) }
 // Validation messages in the page's language instead of the browser's.
 form.querySelectorAll('input, textarea').forEach(field => {
   field.addEventListener('invalid', () => {
@@ -39,12 +44,24 @@ form.querySelectorAll('input, textarea').forEach(field => {
   })
   field.addEventListener('input', () => field.setCustomValidity(''))
 })
-form.addEventListener('submit', ev => {
+form.addEventListener('submit', async ev => {
   ev.preventDefault()
-  const f = Object.fromEntries(new FormData(form))
-  const m = t().contact.mail
-  const subject = `${m.subject} — ${f.nome}${f.tipo ? ` (${f.tipo})` : ''}`
-  const body = [`${m.name}: ${f.nome}`, `${m.email}: ${f.email}`, `${m.type}: ${f.tipo || '—'}`, '', f.mensagem.replace(/\r?\n/g, '\r\n')].join('\r\n')
-  location.href = `mailto:geral@nitesca.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-  form.querySelector('[data-form-status]').hidden = false // kept filled in, in case they need to send again
+  if (sendBtn.disabled) return
+  sendBtn.disabled = true
+  say(sendBtn, 'contact.sending')
+  status.hidden = true
+  let ok = false
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...Object.fromEntries(new FormData(form)), lang: document.documentElement.lang.startsWith('en') ? 'en' : 'pt', elapsed: Date.now() - openedAt }),
+    })
+    ok = res.ok && (await res.json()).ok
+  } catch { /* offline, or no API on the vite dev server: reported below */ }
+  say(sendBtn, 'contact.send')
+  sendBtn.disabled = false
+  say(status, ok ? 'contact.thanks' : 'contact.failed')
+  status.hidden = false
+  if (ok) form.reset()
 })

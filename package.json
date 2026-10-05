@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
-    "check:i18n": "node src/i18n/check.mjs"
+    "check:i18n": "node src/i18n/check.mjs",
+    "test:worker": "node worker/contact.test.mjs"
   },
   "devDependencies": {
     "vite": "^7.0.0"

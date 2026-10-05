@@ -262,13 +262,16 @@
       </div>
     </div>
     <!-- ponytail: no backend yet — the form only confirms locally. Wire to an email/form service before launch. -->
+    <!-- Sent to POST /api/contact (worker/index.js), which emails geral@nitesca.com -->
     <form class="form" data-contact-form>
       <div class="form-row">
-        <label class="field"><span data-i18n="contact.fields.name">Nome</span><input name="nome" required autocomplete="name"></label>
-        <label class="field"><span data-i18n="contact.fields.email">Email</span><input name="email" type="email" required autocomplete="email"></label>
+        <label class="field"><span data-i18n="contact.fields.name">Nome</span><input name="nome" required maxlength="100" autocomplete="name"></label>
+        <label class="field"><span data-i18n="contact.fields.email">Email</span><input name="email" type="email" required maxlength="200" autocomplete="email"></label>
       </div>
-      <label class="field"><span data-i18n="contact.fields.type">Tipo de negócio</span><input name="tipo" placeholder="Florista, contabilista, personal trainer…" data-i18n-attr="placeholder:contact.fields.typePlaceholder"></label>
-      <label class="field"><span data-i18n="contact.fields.message">Mensagem</span><textarea name="mensagem" rows="4" required maxlength="1500"></textarea></label>
+      <label class="field"><span data-i18n="contact.fields.type">Tipo de negócio</span><input name="tipo" maxlength="150" placeholder="Florista, contabilista, personal trainer…" data-i18n-attr="placeholder:contact.fields.typePlaceholder"></label>
+      <label class="field"><span data-i18n="contact.fields.message">Mensagem</span><textarea name="mensagem" rows="4" required maxlength="5000"></textarea></label>
+      <!-- Honeypot: invisible to people; bots fill it in and the Worker silently drops the message -->
+      <div class="hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
       <div class="form-actions">
         <button type="submit" class="btn-dark" data-i18n="contact.send">Enviar</button>
         <p role="status" style="margin:0;font-size:16px" data-form-status hidden data-i18n="contact.thanks">Obrigado — respondemos em breve.</p>

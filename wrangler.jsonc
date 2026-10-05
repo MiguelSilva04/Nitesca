@@ -3,13 +3,26 @@
   // Must match the Worker's name in the Cloudflare dashboard, or a new Worker gets created.
   "name": "nitesca",
   "compatibility_date": "2026-09-01",
+  // Only /api/* runs this script (the contact form); everything else is served as static files.
+  "main": "worker/index.js",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
     // Real 404 status with dist/404.html instead of the home page with 200.
     "not_found_handling": "404-page",
     // /en -> /en/ (each language is a folder with index.html).
     "html_handling": "auto-trailing-slash"
   },
+  // Contact form. RESEND_API_KEY is a secret set in the dashboard, never committed.
+  "vars": {
+    "CONTACT_TO": "geral@nitesca.com",
+    "CONTACT_FROM": "Nitesca <site@nitesca.com>"
+  },
+  // At most 5 contact submissions per minute per IP.
+  "ratelimits": [
+    { "name": "CONTACT_LIMIT", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }
+  ],
   // Only nitesca.com serves the site: no duplicate copy on *.workers.dev competing in search.
   "workers_dev": false,
   "preview_urls": false

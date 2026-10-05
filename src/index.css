@@ -22,6 +22,9 @@ body { margin: 0; background: var(--teal); color: var(--cream); font-family: var
 .skip { position: absolute; left: 16px; top: -100px; z-index: 100; padding: 12px 18px; background: var(--cream); color: var(--teal); font-weight: 600; border-radius: 3px; text-decoration: none }
 .skip:focus { top: 12px }
 main:focus { outline: none }
+/* Contact-form honeypot: off-screen, not display:none (some bots skip hidden fields) */
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden }
+.btn-dark:disabled { opacity: .7; cursor: progress; transform: none }
 a { color: inherit; text-underline-offset: .22em; text-decoration-thickness: 1px }
 a:hover { text-decoration-thickness: 2px }
 :focus-visible { outline: 2px solid var(--sage); outline-offset: 4px }
