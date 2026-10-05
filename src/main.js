@@ -29,7 +29,7 @@ addEventListener('load', () => setTimeout(() => {
   for (const f of ['400 40px Fraunces', '400 40px Lora', '800 40px Archivo']) document.fonts.load(f)
 }, 0))
 
-// ponytail: no backend yet — the form only confirms locally. Wire to an email/form service before launch.
+// No backend: the form opens the visitor's email app with a message to geral@nitesca.com already written.
 const form = document.querySelector('[data-contact-form]')
 // Validation messages in the page's language instead of the browser's.
 form.querySelectorAll('input, textarea').forEach(field => {
@@ -41,6 +41,10 @@ form.querySelectorAll('input, textarea').forEach(field => {
 })
 form.addEventListener('submit', ev => {
   ev.preventDefault()
-  form.querySelector('[data-form-status]').hidden = false
-  form.reset()
+  const f = Object.fromEntries(new FormData(form))
+  const m = t().contact.mail
+  const subject = `${m.subject} — ${f.nome}${f.tipo ? ` (${f.tipo})` : ''}`
+  const body = [`${m.name}: ${f.nome}`, `${m.email}: ${f.email}`, `${m.type}: ${f.tipo || '—'}`, '', f.mensagem.replace(/\r?\n/g, '\r\n')].join('\r\n')
+  location.href = `mailto:geral@nitesca.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  form.querySelector('[data-form-status]').hidden = false // kept filled in, in case they need to send again
 })
