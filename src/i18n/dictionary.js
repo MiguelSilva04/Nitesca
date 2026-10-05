@@ -85,7 +85,6 @@ export const dict = {
     contact: {
       eyebrow: 'FALE CONNOSCO',
       title: 'Vamos falar sobre o seu negócio',
-      phone: '[telefone a definir]',
       fields: {
         name: 'Nome', email: 'Email', type: 'Tipo de negócio',
         typePlaceholder: 'Florista, contabilista, personal trainer…', message: 'Mensagem',
@@ -186,7 +185,6 @@ export const dict = {
     contact: {
       eyebrow: 'GET IN TOUCH',
       title: 'Let’s talk about your business',
-      phone: '[phone TBD]',
       fields: {
         name: 'Name', email: 'Email', type: 'Type of business',
         typePlaceholder: 'Florist, accountant, personal trainer…', message: 'Message',

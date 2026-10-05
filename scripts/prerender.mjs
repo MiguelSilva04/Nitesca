@@ -46,6 +46,8 @@ function jsonLd(tr) {
     inLanguage: tr.meta.htmlLang,
     image: tr.meta.ogImage,
     email: 'geral@nitesca.com',
+    telephone: '+351 938 142 848',
+    contactPoint: ['+351 938 142 848', '+351 965 809 552'].map(telephone => ({ '@type': 'ContactPoint', telephone, email: 'geral@nitesca.com', contactType: 'customer service', availableLanguage: ['Portuguese', 'English'] })),
     makesOffer: offers,
   }
   return JSON.stringify(data).replace(/</g, '\\u003c') // never close the <script> early
@@ -164,6 +166,7 @@ ${pt.process.steps.map((s, i) => `${i + 1}. **${s.title}** — ${s.text}`).join(
 ## Contacto / Contact
 
 - Email: geral@nitesca.com
+- Telefone / Phone: +351 938 142 848, +351 965 809 552
 
 - [${pt.contact.title}](${ORIGIN}/#contacto)
 - [${en.contact.title}](${ORIGIN}/en/#contacto)
