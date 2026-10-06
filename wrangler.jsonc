@@ -17,7 +17,9 @@
   // Contact form. RESEND_API_KEY is a secret set in the dashboard, never committed.
   "vars": {
     "CONTACT_TO": "geral@nitesca.com",
-    "CONTACT_FROM": "Nitesca <site@nitesca.com>"
+    "CONTACT_FROM": "Nitesca · site <site@nitesca.com>",
+    // Sender of the receipt the client gets, so their replies land in the real inbox.
+    "CONTACT_REPLY_FROM": "Nitesca <geral@nitesca.com>"
   },
   // At most 5 contact submissions per minute per IP.
   "ratelimits": [

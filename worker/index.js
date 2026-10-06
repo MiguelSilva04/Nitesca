@@ -52,22 +52,81 @@ async function contact(request, env) {
     'Enviado pelo formulário de contacto de nitesca.com. Responda a este email para responder diretamente ao cliente.',
   ].join('\n')
 
+  // 1) The lead, to the Nitesca inbox. Reply goes straight to the client.
+  const notified = await send(env, {
+    from: env.CONTACT_FROM,
+    to: [env.CONTACT_TO],
+    reply_to: email,
+    subject: oneLine(`Novo contacto: ${nome}${tipo ? ` (${tipo})` : ''}`).slice(0, 150),
+    text,
+    headers: { 'Auto-Submitted': 'auto-generated' }, // RFC 3834: autoresponders must not answer it
+  })
+  if (!notified) return json(502, { ok: false, error: 'send' })
+
+  // 2) The receipt, to the client, from the real inbox so their reply lands there. Fixed text only:
+  // echoing anything they typed would let strangers use the form to send content to any address.
+  const receipt = RECEIPT[lang]
+  const confirmed = await send(env, {
+    from: env.CONTACT_REPLY_FROM,
+    to: [email],
+    reply_to: env.CONTACT_TO,
+    subject: receipt.subject,
+    text: receipt.text,
+    headers: { 'Auto-Submitted': 'auto-replied' }, // so the client's own autoresponder doesn't answer back
+  })
+  // The lead already reached the inbox; a failed receipt is logged, not shown as a failed submission.
+  if (!confirmed) console.error('receipt not sent to client')
+  return json(200, { ok: true })
+}
+
+async function send(env, message) {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: env.CONTACT_FROM,
-      to: [env.CONTACT_TO],
-      reply_to: email,
-      subject: oneLine(`Novo contacto: ${nome}${tipo ? ` (${tipo})` : ''}`).slice(0, 150),
-      text,
-    }),
+    body: JSON.stringify(message),
   })
-  if (!res.ok) {
-    console.error('resend failed', res.status, await res.text())
-    return json(502, { ok: false, error: 'send' })
-  }
-  return json(200, { ok: true })
+  if (!res.ok) console.error('resend failed', res.status, await res.text())
+  return res.ok
+}
+
+const SIGNATURE = 'Miguel Silva e Tiago Candeias\nNitesca · nitesca.com'
+const RECEIPT = {
+  pt: {
+    subject: 'Recebemos a sua mensagem | Nitesca',
+    text: [
+      'Olá,',
+      '',
+      'Obrigado por nos escrever. Recebemos a sua mensagem e um dos sócios da Nitesca vai responder-lhe pessoalmente, normalmente em até 2 dias úteis.',
+      '',
+      'Para adiantar a conversa, ajuda-nos saber:',
+      '• o tipo de negócio e a cidade;',
+      '• o endereço do site ou das redes sociais que já têm, se existirem;',
+      '• o que gostaria de melhorar ou conseguir com a presença online.',
+      '',
+      'Até breve,',
+      SIGNATURE,
+      '',
+      'Esta é uma resposta automática. Pode responder a este email com mais informação, chega-nos na mesma.',
+    ].join('\n'),
+  },
+  en: {
+    subject: 'We received your message | Nitesca',
+    text: [
+      'Hello,',
+      '',
+      'Thank you for getting in touch. We received your message and one of Nitesca’s partners will reply to you personally, usually within 2 business days.',
+      '',
+      'To get the conversation going, it helps us to know:',
+      '• your type of business and city;',
+      '• the address of your website or social media, if you already have them;',
+      '• what you would like to improve or achieve with your online presence.',
+      '',
+      'Speak soon,',
+      SIGNATURE.replace(' e ', ' and '),
+      '',
+      'This is an automatic reply. You can reply to this email with more information and it will reach us.',
+    ].join('\n'),
+  },
 }
 
 export default {
