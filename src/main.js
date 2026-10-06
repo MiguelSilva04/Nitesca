@@ -49,6 +49,7 @@ function loadTurnstile() {
     tsWidget = window.turnstile.render(tsSlot, {
       sitekey: tsKey,
       appearance: 'interaction-only', // invisible unless a click is really needed
+      theme: 'light', // the form sits on the cream background
       callback: token => { tsToken = token },
       'expired-callback': () => { tsToken = '' },
       'error-callback': () => { tsToken = '' },
