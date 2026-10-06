@@ -272,6 +272,9 @@
       <label class="field"><span data-i18n="contact.fields.message">Mensagem</span><textarea name="mensagem" rows="4" required maxlength="5000"></textarea></label>
       <!-- Honeypot: invisible to people; bots fill it in and the Worker silently drops the message -->
       <div class="hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <!-- Cloudflare Turnstile anti-bot check (main.js). Put the widget's site key in data-sitekey;
+           empty = off. Invisible unless Cloudflare needs the visitor to click once. -->
+      <div class="turnstile" data-turnstile data-sitekey="0x4AAAAAAFPkKl4G3XdP4-Hj"></div>
       <div class="form-actions">
         <button type="submit" class="btn-dark" data-i18n="contact.send">Enviar</button>
         <p role="status" style="margin:0;font-size:16px" data-form-status hidden data-i18n="contact.thanks">Obrigado — respondemos em breve.</p>

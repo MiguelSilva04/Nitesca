@@ -36,6 +36,41 @@ const sendBtn = form.querySelector('[type=submit]')
 const openedAt = Date.now() // the Worker drops forms sent implausibly fast (bots)
 // Messages carry their dictionary key, so switching language re-translates them too.
 const say = (el, key) => { el.dataset.i18n = key; el.textContent = key.split('.').reduce((o, k) => o[k], t()) }
+
+// Cloudflare Turnstile: proves a real browser sent the form. The script loads only when the visitor
+// nears the form, so it never costs anything on page load. No site key in index.html = off.
+const tsSlot = form.querySelector('[data-turnstile]')
+const tsKey = tsSlot?.dataset.sitekey
+let tsWidget = null, tsToken = '', tsLoading = false
+function loadTurnstile() {
+  if (!tsKey || tsLoading) return
+  tsLoading = true
+  window.onTurnstileLoad = () => {
+    tsWidget = window.turnstile.render(tsSlot, {
+      sitekey: tsKey,
+      appearance: 'interaction-only', // invisible unless a click is really needed
+      callback: token => { tsToken = token },
+      'expired-callback': () => { tsToken = '' },
+      'error-callback': () => { tsToken = '' },
+    })
+  }
+  const s = document.createElement('script')
+  s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&render=explicit'
+  s.async = true
+  document.head.append(s)
+}
+if (tsKey) {
+  const io = new IntersectionObserver(entries => { if (entries.some(e => e.isIntersecting)) { io.disconnect(); loadTurnstile() } }, { rootMargin: '600px' })
+  io.observe(form)
+  form.addEventListener('focusin', loadTurnstile, { once: true })
+}
+// Wait (briefly) for the token: the check runs in the background while the visitor types.
+async function turnstileToken() {
+  if (!tsKey) return ''
+  loadTurnstile()
+  for (let waited = 0; !tsToken && waited < 15000; waited += 250) await new Promise(r => setTimeout(r, 250))
+  return tsToken
+}
 // Validation messages in the page's language instead of the browser's.
 form.querySelectorAll('input, textarea').forEach(field => {
   field.addEventListener('invalid', () => {
@@ -55,7 +90,7 @@ form.addEventListener('submit', async ev => {
     const res = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...Object.fromEntries(new FormData(form)), lang: document.documentElement.lang.startsWith('en') ? 'en' : 'pt', elapsed: Date.now() - openedAt }),
+      body: JSON.stringify({ ...Object.fromEntries(new FormData(form)), lang: document.documentElement.lang.startsWith('en') ? 'en' : 'pt', elapsed: Date.now() - openedAt, token: await turnstileToken() }),
     })
     ok = res.ok && (await res.json()).ok
   } catch { /* offline, or no API on the vite dev server: reported below */ }
@@ -64,4 +99,6 @@ form.addEventListener('submit', async ev => {
   say(status, ok ? 'contact.thanks' : 'contact.failed')
   status.hidden = false
   if (ok) form.reset()
+  // A token is single-use: get a fresh one for a possible next message.
+  if (tsWidget !== null) { tsToken = ''; window.turnstile.reset(tsWidget) }
 })

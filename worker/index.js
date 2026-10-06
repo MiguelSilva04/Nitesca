@@ -2,8 +2,9 @@
 // layer; only /api/* reaches this code (see "run_worker_first" in wrangler.jsonc).
 //
 // POST /api/contact — validates the contact form and emails it to CONTACT_TO through Resend.
-// Needs the secret RESEND_API_KEY (Worker → Settings → Variables and Secrets) and nitesca.com
-// verified as a sending domain in Resend.
+// Needs the secret RESEND_API_KEY and nitesca.com verified as a sending domain in Resend.
+// Optional secret TURNSTILE_SECRET (Cloudflare Turnstile): once set, every submission must pass the
+// anti-bot check, and only then does the client's receipt include a copy of their message.
 
 const LIMITS = { nome: 100, email: 200, tipo: 150, mensagem: 5000 }
 const MIN_FILL_MS = 3000 // humans don't fill and send the form in under 3 s
@@ -40,6 +41,11 @@ async function contact(request, env) {
   if (!nome || !mensagem || !EMAIL_RE.test(email)) return json(400, { ok: false, error: 'fields' })
   for (const [k, max] of Object.entries(LIMITS)) if (field(k).length > max) return json(400, { ok: false, error: 'fields' })
 
+  // Turnstile proves a real browser filled the form. It's what makes echoing the message back safe:
+  // without it, scripts could use the receipt to send any text to any address from geral@.
+  const verified = env.TURNSTILE_SECRET ? await turnstileOk(env, field('token'), request) : false
+  if (env.TURNSTILE_SECRET && !verified) return json(403, { ok: false, error: 'captcha' })
+
   const text = [
     `Nome: ${nome}`,
     `Email: ${email}`,
@@ -63,20 +69,32 @@ async function contact(request, env) {
   })
   if (!notified) return json(502, { ok: false, error: 'send' })
 
-  // 2) The receipt, to the client, from the real inbox so their reply lands there. Fixed text only:
-  // echoing anything they typed would let strangers use the form to send content to any address.
+  // 2) The receipt, to the client, from the real inbox so their reply lands there. It includes a copy
+  // of what they wrote (so they can find it in their inbox) only when Turnstile verified the sender.
   const receipt = RECEIPT[lang]
   const confirmed = await send(env, {
     from: env.CONTACT_REPLY_FROM,
     to: [email],
     reply_to: env.CONTACT_TO,
     subject: receipt.subject,
-    text: receipt.text,
+    text: verified ? `${receipt.text}\n\n${receipt.copy({ nome, email, tipo, mensagem })}` : receipt.text,
     headers: { 'Auto-Submitted': 'auto-replied' }, // so the client's own autoresponder doesn't answer back
   })
   // The lead already reached the inbox; a failed receipt is logged, not shown as a failed submission.
   if (!confirmed) console.error('receipt not sent to client')
   return json(200, { ok: true })
+}
+
+async function turnstileOk(env, token, request) {
+  if (!token) return false
+  const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ secret: env.TURNSTILE_SECRET, response: token, remoteip: request.headers.get('CF-Connecting-IP') || undefined }),
+  })
+  const out = await res.json().catch(() => ({}))
+  if (!out.success) console.error('turnstile failed', JSON.stringify(out['error-codes'] || []))
+  return out.success === true
 }
 
 async function send(env, message) {
@@ -108,6 +126,7 @@ const RECEIPT = {
       '',
       'Esta é uma resposta automática. Pode responder a este email com mais informação, chega-nos na mesma.',
     ].join('\n'),
+    copy: f => ['— A sua mensagem —', '', `Nome: ${f.nome}`, `Email: ${f.email}`, `Tipo de negócio: ${f.tipo || '—'}`, '', f.mensagem].join('\n'),
   },
   en: {
     subject: 'We received your message | Nitesca',
@@ -126,6 +145,7 @@ const RECEIPT = {
       '',
       'This is an automatic reply. You can reply to this email with more information and it will reach us.',
     ].join('\n'),
+    copy: f => ['— Your message —', '', `Name: ${f.nome}`, `Email: ${f.email}`, `Type of business: ${f.tipo || '—'}`, '', f.mensagem].join('\n'),
   },
 }
 

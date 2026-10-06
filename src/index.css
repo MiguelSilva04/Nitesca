@@ -24,6 +24,7 @@ body { margin: 0; background: var(--teal); color: var(--cream); font-family: var
 main:focus { outline: none }
 /* Contact-form honeypot: off-screen, not display:none (some bots skip hidden fields) */
 .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden }
+.turnstile:empty { display: none }
 .btn-dark:disabled { opacity: .7; cursor: progress; transform: none }
 a { color: inherit; text-underline-offset: .22em; text-decoration-thickness: 1px }
 a:hover { text-decoration-thickness: 2px }

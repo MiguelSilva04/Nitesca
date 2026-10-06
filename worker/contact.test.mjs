@@ -81,6 +81,40 @@ failWhen = m => m.to[0] === 'ana@example.com'
 assert.equal(await status(post(good)), 200, 'receipt failure does not fail the submission')
 assert.equal(sent.length, 2)
 
+// Turnstile configured: token required; a verified sender gets a copy of their message
+failWhen = () => false
+const tsEnv = { ...env, TURNSTILE_SECRET: 'ts_secret' }
+const realFetch = globalThis.fetch
+let verifyCalls = []
+globalThis.fetch = async (url, init) => {
+  if (String(url).includes('turnstile')) {
+    const body = JSON.parse(init.body)
+    verifyCalls.push(body)
+    return Response.json({ success: body.response === 'good-token' && body.secret === 'ts_secret' })
+  }
+  return realFetch(url, init)
+}
+const postTs = body => worker.fetch(new Request(`${ORIGIN}/api/contact`, {
+  method: 'POST', headers: { Origin: ORIGIN, 'Content-Type': 'application/json', 'CF-Connecting-IP': '203.0.113.7' }, body: JSON.stringify(body),
+}), tsEnv)
+
+sent = []
+assert.equal(await status(postTs(good)), 403, 'no token → rejected')
+assert.equal(await status(postTs({ ...good, token: 'forged' })), 403, 'bad token → rejected')
+assert.equal(sent.length, 0, 'failed checks send nothing')
+assert.equal(verifyCalls.at(-1).remoteip, '203.0.113.7', 'visitor IP is passed to Turnstile')
+
+const verifiedRes = await postTs({ ...good, token: 'good-token' })
+assert.equal(verifiedRes.status, 200)
+assert.equal(sent.length, 2)
+const copy = sent[1].body.text
+assert.match(copy, /— A sua mensagem —\n\nNome: Ana Silva\nEmail: ana@example\.com\nTipo de negócio: Florista\n\nOlá!\nQueria um site\.$/, 'verified receipt ends with a copy of the message')
+assert.ok(copy.startsWith('Olá,\n\nObrigado por nos escrever'), 'copy comes after the normal receipt')
+sent = []
+await postTs({ ...good, lang: 'en', token: 'good-token' })
+assert.match(sent[1].body.text, /— Your message —\n\nName: Ana Silva\nEmail: ana@example\.com\nType of business: Florista/)
+globalThis.fetch = realFetch
+
 // Routing
 assert.equal(await (await worker.fetch(new Request(`${ORIGIN}/en/`), env)).text(), 'static', 'other paths go to the static site')
 assert.equal(await status(worker.fetch(new Request(`${ORIGIN}/api/other`), env)), 404)
